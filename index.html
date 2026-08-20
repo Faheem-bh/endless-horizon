@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ENDLESS HORIZON: 90-DAY FOCUS</title>
+    
+    <!-- PWA Manifest & iOS Metas -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EndlessHorizon">
+    <meta name="theme-color" content="#161922">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #161922;
+            --bg-surface: #202532;
+            --card-border: #2e3547;
+            
+            --pastel-sage: #a8d5ba;
+            --pastel-blue: #9bb7d4;
+            --pastel-peach: #f4c2ac;
+            --pastel-lavender: #c5b4e3;
+            --pastel-rose: #e8a7a1;
+            
+            --cloud-white: #f0f3f8;
+            --text-muted: #8e99b0;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            
+            --nav-height: 75px;
+            --sidebar-width: 240px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            background-color: var(--bg-deep);
+            color: var(--cloud-white);
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom));
+            margin: 0 auto;
+            position: relative;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
+
+        .app-viewport {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: max-width 0.3s ease;
+        }
+
+        header {
+            background: var(--bg-deep);
+            padding-top: calc(16px + var(--safe-area-top));
+            padding-bottom: 12px;
+            padding-left: 16px;
+            padding-right: 16px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .brand-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.1rem, 4.5vw, 1.35rem);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--pastel-peach);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .horizon-clock {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            color: var(--pastel-blue);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: clamp(0.62rem, 2.5vw, 0.72rem);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--card-border);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding-top: 8px;
+            padding-bottom: calc(8px + var(--safe-area-bottom));
+            z-index: 100;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: clamp(0.55rem, 2vw, 0.65rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.1s, background 0.2s;
+            padding: 4px 0;
+            position: relative;
+        }
+
+        .tab-btn:active {
+            transform: scale(0.92);
+        }
+
+        .tab-btn.active {
+            color: var(--pastel-peach);
+        }
+
+        .tab-btn.active::before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            width: 22px;
+            height: 3px;
+            border-radius: 3px;
+            background: var(--pastel-peach);
+        }
+
+        .tab-btn svg {
+            width: clamp(18px, 5vw, 22px);
+            height: clamp(18px, 5vw, 22px);
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .page {
+            display: none;
+            padding: 16px;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .hero-banner {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--pastel-peach);
+            border-radius: var(--radius-lg);
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hero-title {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .hero-goal {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1rem, 4vw, 1.25rem);
+            font-weight: 700;
+            color: var(--cloud-white);
+            word-break: break-word;
+        }
+
+        .sub-targets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 2px;
+            padding-top: 6px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .sub-target-tag {
+            font-size: 0.75rem;
+            color: var(--pastel-blue);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .sub-target-tag::before {
+            content: "•";
+            color: var(--pastel-peach);
+            font-size: 1rem;
+        }
+
+        .hero-quote {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 12px 6px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card:nth-child(1) { border-bottom: 3px solid var(--pastel-blue); }
+        .stat-card:nth-child(2) { border-bottom: 3px solid var(--pastel-peach); }
+        .stat-card:nth-child(3) { border-bottom: 3px solid var(--pastel-rose); }
+        .stat-card:nth-child(4) { border-bottom: 3px solid var(--pastel-lavender); }
+
+        .stat-card:nth-child(1) .stat-val { color: var(--pastel-blue); }
+        .stat-card:nth-child(2) .stat-val { color: var(--pastel-peach); }
+        .stat-card:nth-child(3) .stat-val { color: var(--pastel-rose); }
+        .stat-card:nth-child(4) .stat-val { color: var(--pastel-lavender); }
+
+        .stat-val {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.2rem, 5vw, 1.6rem);
+            line-height: 1.1;
+            font-weight: 700;
+        }
+
+        .stat-lbl {
+            font-size: clamp(0.58rem, 2.2vw, 0.65rem);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 3px;
+            letter-spacing: 0.04em;
+        }
+
+        .card-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(0.95rem, 3.8vw, 1.1rem);
+            font-weight: 700;
+            color: var(--cloud-white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-item {
+            background: var(--bg-deep);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            cursor: pointer;
+            min-height: 52px;
+            transition: border-color 0.2s;
+        }
+
+        .task-item:hover { border-color: var(--pastel-peach); }
+
+        .task-item.done {
+            border-color: var(--pastel-sage);
+            background: var(--bg-surface);
+        }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .task-name {
+            font-size: clamp(0.8rem, 3.2vw, 0.88rem);
+            font-weight: 600;
+            color: var(--cloud-white);
+            word-break: break-word;
+        }
+
+        .task-item.done .task-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-sub {
+            font-size: clamp(0.65rem, 2.6vw, 0.72rem);
+            color: var(--text-muted);
+        }
+
+        .task-check {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            border: 2px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .task-item.done .task-check {
+            background: var(--pastel-sage);
+            border-color: var(--pastel-sage);
+            color: #121815;
+            font-weight: bold;
+        }
+
+        .journal-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .recorder-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-record-native {
+            flex: 1;
+            min-width: 130px;
+            min-height: 48px;
+            background: var(--bg-deep);
+            border: 1px solid var(--card-border);
+            color: var(--cloud-white);
+            padding: 10px;
+            border-radius: var(--radius-md);
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .btn-record-native input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .journal-status {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.35;
+        }
+
+        .btn-delete-media {
+            background: none;
+            border: none;
+            color: var(--pastel-rose);
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .btn-delete-media:active {
+            background: rgba(232, 167, 161, 0.15);
+        }
+
+        .ted-main-link {
+            background: var(--bg-deep);
+            border: 1px solid var(--pastel-rose);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: var(--pastel-rose);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .ted-item {
+            background: var(--bg-deep);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: var(--cloud-white);
+            gap: 8px;
+            min-height: 50px;
+        }
+
+        .ted-title {
+            font-size: clamp(0.78rem, 3.2vw, 0.85rem);
+            font-weight: 600;
+            line-height: 1.25;
+        }
+
+        .ted-speaker {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .book-item {
+            background: var(--bg-deep);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .book-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--pastel-peach);
+        }
+
+        .book-author {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .book-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .book-slider {
+            flex: 1;
+            accent-color: var(--pastel-peach);
+        }
+
+        .book-percent {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--pastel-sage);
+            min-width: 38px;
+            text-align: right;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat( auto-fit, minmax(28px, 1fr) );
+            gap: 5px;
+        }
+
+        .grid-node {
+            aspect-ratio: 1;
+            background: var(--bg-deep);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.55rem, 2.2vw, 0.65rem);
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .grid-node.done {
+            background: var(--pastel-sage);
+            border-color: var(--pastel-sage);
+            color: #121815;
+            font-weight: 700;
+        }
+
+        .grid-node.active {
+            border-color: var(--pastel-peach);
+            color: var(--pastel-peach);
+            font-weight: 800;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--pastel-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-input {
+            background: var(--bg-deep);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 12px 10px;
+            color: var(--cloud-white);
+            font-size: 0.85rem;
+            outline: none;
+            width: 100%;
+        }
+
+        .form-input:focus {
+            border-color: var(--pastel-peach);
+        }
+
+        .btn-save {
+            background: var(--pastel-peach);
+            color: #1a1512;
+            border: none;
+            padding: 14px;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 6px;
+            min-height: 48px;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-reset-danger {
+            background: var(--bg-deep);
+            border: 1px solid var(--pastel-rose);
+            color: var(--pastel-rose);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            min-height: 44px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .toast {
+            position: fixed;
+            top: calc(12px + var(--safe-area-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--pastel-sage);
+            color: #101a14;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            transition: transform 0.3s ease;
+            z-index: 300;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Desktop Media Queries */
+        @media (min-width: 768px) {
+            body {
+                padding-bottom: 0;
+                padding-left: var(--sidebar-width);
+            }
+
+            .tab-bar {
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: var(--sidebar-width);
+                height: 100vh;
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(5, auto);
+                justify-content: start;
+                align-content: start;
+                padding-top: 80px;
+                padding-bottom: 20px;
+                padding-left: 12px;
+                padding-right: 12px;
+                gap: 8px;
+                border-top: none;
+                border-right: 1px solid var(--card-border);
+            }
+
+            .tab-btn {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 12px;
+                padding: 12px 16px;
+                border-radius: var(--radius-md);
+                font-size: 0.85rem;
+                width: 100%;
+            }
+
+            .tab-btn:hover {
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--cloud-white);
+            }
+
+            .tab-btn.active {
+                background: var(--bg-deep);
+                color: var(--pastel-peach);
+                border: 1px solid var(--card-border);
+            }
+
+            .tab-btn.active::before {
+                display: none;
+            }
+
+            .app-viewport {
+                max-width: 850px;
+                margin: 0 auto;
+                padding: 20px 30px;
+            }
+
+            header {
+                position: relative;
+                background: transparent;
+                border-bottom: 1px solid var(--card-border);
+                padding-left: 0;
+                padding-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .page {
+                padding: 16px 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .matrix-grid {
+                grid-template-columns: repeat(15, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toastMsg">SAVED</div>
+
+    <div class="app-viewport">
+        <header>
+            <div class="brand-banner">
+                <div class="brand-title">ENDLESS HORIZON</div>
+                <div class="horizon-clock" id="midnightCountdown">
+                    ⚡ 00H 00M LEFT
+                </div>
+            </div>
+        </header>
+
+        <!-- PAGE 1: TRACKER DASHBOARD -->
+        <main id="page-dashboard" class="page active">
+            <div class="hero-banner">
+                <div class="hero-title">Main Target</div>
+                <div class="hero-goal" id="displayGoal">FULL-STACK & MASTERY</div>
+                <div class="sub-targets-list" id="displaySubTargetsContainer"></div>
+                <div class="hero-quote">"The sky is not the limit. It is the beginning."</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-val" id="currentStreak">1</div>
+                    <div class="stat-lbl">Active Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="bestStreak">1</div>
+                    <div class="stat-lbl">Best Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="failedAttempts">0</div>
+                    <div class="stat-lbl">Failed Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="totalDaysTried">1</div>
+                    <div class="stat-lbl">Total Days Tried</div>
+                </div>
+            </div>
+
+            <div class="card-box">
+                <div class="card-header">
+                    <span>Daily Non-Negotiables</span>
+                    <span style="color: var(--pastel-blue); font-size: 0.85rem;" id="completionFraction">0/4</span>
+                </div>
+
+                <div class="task-item" onclick="toggleTask(0)">
+                    <div class="task-info">
+                        <div class="task-name" id="taskName0">Deep Focus Practice</div>
+                        <div class="task-sub" id="taskSub0">45 Minutes • Uninterrupted Execution</div>
+                    </div>
+                    <div class="task-check" id="chk-0">✓</div>
+                </div>
+
+                <div class="task-item" onclick="toggleTask(1)">
+                    <div class="task-info">
+                        <div class="task-name" id="taskName1">Theory & Input Learning</div>
+                        <div class="task-sub" id="taskSub1">20 Minutes • Active Reading</div>
+                    </div>
+                    <div class="task-check" id="chk-1">✓</div>
+                </div>
+
+                <div class="task-item" onclick="toggleTask(2)">
+                    <div class="task-info">
+                        <div class="task-name">Daily Proof of Work</div>
+                        <div class="task-sub">Code Commit or Output Check</div>
+                    </div>
+                    <div class="task-check" id="chk-2">✓</div>
+                </div>
+
+                <div class="task-item" onclick="toggleTask(3)">
+                    <div class="task-info">
+                        <div class="task-name">Nightly Reflection Audit</div>
+                        <div class="task-sub">Log progress before midnight</div>
+                    </div>
+                    <div class="task-check" id="chk-3">✓</div>
+                </div>
+            </div>
+
+            <div class="journal-box">
+                <div class="card-header">
+                    <span style="font-size: 0.9rem;">Daily Audio/Video Journal</span>
+                    <span style="font-size: 0.65rem; color: var(--pastel-peach); background: var(--bg-deep); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--card-border);">PERSISTENT MEDIA</span>
+                </div>
+                <div class="journal-status">Record reflections directly into local storage. Audio and video persist across sessions.</div>
+                
+                <div class="recorder-controls">
+                    <label class="btn-record-native">
+                        🎙️ Voice Recorder
+                        <input type="file" accept="audio/*" capture="microphone" onchange="handleNativeFileSelect(event, 'audio')">
+                    </label>
+                    <label class="btn-record-native">
+                        📹 Video Recorder
+                        <input type="file" accept="video/*" capture="camcorder" onchange="handleNativeFileSelect(event, 'video')">
+                    </label>
+                </div>
+            </div>
+        </main>
+
+        <!-- PAGE 2: TED TALKS & SELF-DEVELOPMENT BOOKS -->
+        <main id="page-ted" class="page">
+            <div class="hero-banner" style="border-left-color: var(--pastel-rose);">
+                <div class="hero-title">Knowledge Hub</div>
+                <div class="hero-goal">TED TALKS & BOOK TRACKER</div>
+                <div class="hero-quote">"Continuous personal growth through powerful ideas."</div>
+            </div>
+
+            <a class="ted-main-link" href="https://www.ted.com" target="_blank" rel="noopener">
+                <span>🌐 Visit Official TED Talks Home Page</span>
+                <span>↗</span>
+            </a>
+
+            <div class="card-box">
+                <div class="card-header">
+                    <span>Self-Development Books</span>
+                    <span style="font-size:0.75rem; color:var(--pastel-sage);" id="booksCount">0 Books</span>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" class="form-input" id="newBookTitle" placeholder="Book Title (e.g., Atomic Habits)">
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" class="form-input" id="newBookAuthor" placeholder="Author Name">
+                        <button class="btn-save" style="margin-top:0; min-height:auto; padding:0 16px;" onclick="addBook()">Add</button>
+                    </div>
+                </div>
+
+                <div id="booksListContainer" style="display:flex; flex-direction:column; gap:10px; margin-top:6px;"></div>
+            </div>
+
+            <div class="card-box">
+                <div class="card-header">Curated Talks</div>
+                
+                <a class="ted-item" href="https://www.ted.com/talks/angela_lee_duckworth_grit_the_power_of_passion_and_perseverance" target="_blank" rel="noopener">
+                    <div>
+                        <div class="ted-title">Grit: The Power of Passion & Perseverance</div>
+                        <div class="ted-speaker">Angela Lee Duckworth • 6 Mins</div>
+                    </div>
+                    <span style="color: var(--pastel-blue); font-weight: bold;">↗</span>
+                </a>
+
+                <a class="ted-item" href="https://www.ted.com/talks/tim_ferriss_why_you_should_define_your_fears_instead_of_your_goals" target="_blank" rel="noopener">
+                    <div>
+                        <div class="ted-title">Why You Should Define Your Fears Instead of Goals</div>
+                        <div class="ted-speaker">Tim Ferriss • 13 Mins</div>
+                    </div>
+                    <span style="color: var(--pastel-blue); font-weight: bold;">↗</span>
+                </a>
+
+                <a class="ted-item" href="https://www.ted.com/talks/mel_robbins_how_to_stop_screwing_yourself_over" target="_blank" rel="noopener">
+                    <div>
+                        <div class="ted-title">How to Stop Screwing Yourself Over</div>
+                        <div class="ted-speaker">Mel Robbins • 14 Mins</div>
+                    </div>
+                    <span style="color: var(--pastel-blue); font-weight: bold;">↗</span>
+                </a>
+
+                <a class="ted-item" href="https://www.ted.com/talks/carol_dweck_the_power_of_believing_that_you_can_improve" target="_blank" rel="noopener">
+                    <div>
+                        <div class="ted-title">The Power of Believing You Can Improve</div>
+                        <div class="ted-speaker">Carol Dweck • 10 Mins</div>
+                    </div>
+                    <span style="color: var(--pastel-blue); font-weight: bold;">↗</span>
+                </a>
+            </div>
+        </main>
+
+        <!-- PAGE 3: 90-DAY MATRIX -->
+        <main id="page-matrix" class="page">
+            <div class="hero-banner" style="border-left-color: var(--pastel-sage);">
+                <div class="hero-title">Endless Progression</div>
+                <div class="hero-goal">90-DAY HORIZON GRID</div>
+                <div class="hero-quote">"Each filled node is a brick in your foundation."</div>
+            </div>
+
+            <div class="card-box">
+                <div class="matrix-grid" id="matrixContainer"></div>
+            </div>
+        </main>
+
+        <!-- PAGE 4: JOURNAL ARCHIVE -->
+        <main id="page-archive" class="page">
+            <div class="hero-banner" style="border-left-color: var(--pastel-lavender);">
+                <div class="hero-title">Daily Reflections</div>
+                <div class="hero-goal">PERSISTENT VOICE & VIDEO ARCHIVE</div>
+                <div class="hero-quote">"Look back to see how far you've traveled."</div>
+            </div>
+
+            <div class="card-box">
+                <div class="card-header">Saved Reflections</div>
+                <div id="journalArchiveList" style="display:flex; flex-direction:column; gap:12px;">
+                    <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:20px 0;">No audio or video entries recorded yet.</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- PAGE 5: SETTINGS MENU -->
+        <main id="page-settings" class="page">
+            <div class="hero-banner" style="border-left-color: var(--pastel-blue);">
+                <div class="hero-title">Personal Alignment</div>
+                <div class="hero-goal">GOALS, SUB-TARGETS & RESET</div>
+            </div>
+
+            <div class="card-box">
+                <div class="form-group">
+                    <label class="form-label">Main Target / Focus Domain</label>
+                    <input type="text" class="form-input" id="cfgGoalTitle" value="FULL-STACK & MASTERY">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sub-Targets (Max 3)</label>
+                    <input type="text" class="form-input" id="cfgSubTarget1" placeholder="Sub-target 1" style="margin-bottom:6px;">
+                    <input type="text" class="form-input" id="cfgSubTarget2" placeholder="Sub-target 2" style="margin-bottom:6px;">
+                    <input type="text" class="form-input" id="cfgSubTarget3" placeholder="Sub-target 3">
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="form-group">
+                        <label class="form-label">Deep Focus (Mins)</label>
+                        <input type="number" class="form-input" id="cfgDeepTime" value="45">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Theory Study (Mins)</label>
+                        <input type="number" class="form-input" id="cfgTheoryTime" value="20">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Custom Task 1 Name</label>
+                    <input type="text" class="form-input" id="cfgTask1Name" value="Deep Focus Practice">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Custom Task 2 Name</label>
+                    <input type="text" class="form-input" id="cfgTask2Name" value="Theory & Input Learning">
+                </div>
+
+                <button class="btn-save" onclick="saveSettings()">Save Configuration</button>
+            </div>
+
+            <div class="card-box" style="border-color: var(--card-border);">
+                <div class="card-header" style="color: var(--pastel-rose);">Danger Zone</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Resetting your streak records a failed attempt and returns your active streak count back to Day 1.</div>
+                <button class="btn-reset-danger" onclick="triggerResetModal()">⚠️ Reset Current Streak to Day 1</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- BOTTOM TAB NAVIGATION -->
+    <nav class="tab-bar">
+        <button class="tab-btn active" onclick="switchPage('dashboard', this)">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            Tracker
+        </button>
+        <button class="tab-btn" onclick="switchPage('ted', this)">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            TED & Books
+        </button>
+        <button class="tab-btn" onclick="switchPage('matrix', this)">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            90-Grid
+        </button>
+        <button class="tab-btn" onclick="switchPage('archive', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+            Journal
+        </button>
+        <button class="tab-btn" onclick="switchPage('settings', this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+        </button>
+    </nav>
+
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('Service Worker Registered:', reg.scope))
+                    .catch((err) => console.error('Service Worker Registration Failed:', err));
+            });
+        }
+
+        const TOTAL_TASKS = 4;
+        let indexedDBInstance = null;
+
+        let db = {
+            goal: 'FULL-STACK & MASTERY',
+            subTargets: ['System Architecture & Design', 'Daily Algorithm Optimization', 'Open Source Contribution'],
+            deepTime: 45,
+            theoryTime: 20,
+            task1Name: 'Deep Focus Practice',
+            task2Name: 'Theory & Input Learning',
+            currentStreak: 1,
+            failedAttempts: 0,
+            todayTasks: [false, false, false, false],
+            completedDays: {},
+            journalMeta: [],
+            books: [],
+            lastActiveDate: new Date().toDateString()
+        };
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('EndlessHorizonDB', 1);
+                request.onupgradeneeded = (e) => {
+                    const dbInstance = e.target.result;
+                    if (!dbInstance.objectStoreNames.contains('media_journal')) {
+                        dbInstance.createObjectStore('media_journal', { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = (e) => {
+                    indexedDBInstance = e.target.result;
+                    resolve(indexedDBInstance);
+                };
+                request.onerror = (e) => reject(e);
+            });
+        }
+
+        function saveMediaBlobToIDB(item, fileBlob) {
+            return new Promise((resolve, reject) => {
+                const tx = indexedDBInstance.transaction('media_journal', 'readwrite');
+                const store = tx.objectStore('media_journal');
+                store.put({ id: item.id, blob: fileBlob });
+                tx.oncomplete = () => resolve();
+                tx.onerror = (e) => reject(e);
+            });
+        }
+
+        function getMediaBlobFromIDB(id) {
+            return new Promise((resolve, reject) => {
+                const tx = indexedDBInstance.transaction('media_journal', 'readonly');
+                const store = tx.objectStore('media_journal');
+                const req = store.get(id);
+                req.onsuccess = () => resolve(req.result ? req.result.blob : null);
+                req.onerror = (e) => reject(e);
+            });
+        }
+
+        function deleteMediaBlobFromIDB(id) {
+            return new Promise((resolve, reject) => {
+                const tx = indexedDBInstance.transaction('media_journal', 'readwrite');
+                const store = tx.objectStore('media_journal');
+                store.delete(id);
+                tx.oncomplete = () => resolve();
+                tx.onerror = (e) => reject(e);
+            });
+        }
+
+        function checkDayRollover() {
+            const today = new Date().toDateString();
+            if (db.lastActiveDate !== today) {
+                const previousDayComplete = db.todayTasks.filter(Boolean).length === TOTAL_TASKS;
+                if (previousDayComplete) {
+                    db.currentStreak += 1;
+                } else {
+                    db.failedAttempts += 1;
+                    db.currentStreak = 1;
+                }
+                db.todayTasks = [false, false, false, false];
+                db.lastActiveDate = today;
+                saveStorage();
+            }
+        }
+
+        async function init() {
+            try { await initDB(); } catch(e) { console.error('IndexedDB Failed', e); }
+            loadStorage();
+            checkDayRollover();
+            populateSettingsFields();
+            renderDashboard();
+            renderBooks();
+            renderMatrix();
+            renderArchive();
+            startMidnightTimer();
+        }
+
+        function loadStorage() {
+            const data = localStorage.getItem('endless_sky_tracker');
+            if (data) {
+                try { db = { ...db, ...JSON.parse(data) }; } catch(e){}
+            }
+        }
+
+        function saveStorage() {
+            localStorage.setItem('endless_sky_tracker', JSON.stringify(db));
+        }
+
+        function populateSettingsFields() {
+            document.getElementById('cfgGoalTitle').value = db.goal || '';
+            document.getElementById('cfgSubTarget1').value = db.subTargets[0] || '';
+            document.getElementById('cfgSubTarget2').value = db.subTargets[1] || '';
+            document.getElementById('cfgSubTarget3').value = db.subTargets[2] || '';
+            document.getElementById('cfgDeepTime').value = db.deepTime || 45;
+            document.getElementById('cfgTheoryTime').value = db.theoryTime || 20;
+            document.getElementById('cfgTask1Name').value = db.task1Name || '';
+            document.getElementById('cfgTask2Name').value = db.task2Name || '';
+        }
+
+        function saveSettings() {
+            db.goal = document.getElementById('cfgGoalTitle').value || 'FULL-STACK & MASTERY';
+            const sub1 = document.getElementById('cfgSubTarget1').value.trim();
+            const sub2 = document.getElementById('cfgSubTarget2').value.trim();
+            const sub3 = document.getElementById('cfgSubTarget3').value.trim();
+            db.subTargets = [sub1, sub2, sub3].filter(Boolean);
+
+            db.deepTime = parseInt(document.getElementById('cfgDeepTime').value) || 45;
+            db.theoryTime = parseInt(document.getElementById('cfgTheoryTime').value) || 20;
+            db.task1Name = document.getElementById('cfgTask1Name').value || 'Deep Focus Practice';
+            db.task2Name = document.getElementById('cfgTask2Name').value || 'Theory & Input Learning';
+
+            saveStorage();
+            renderDashboard();
+            showToast("Settings Saved");
+        }
+
+        function toggleTask(index) {
+            db.todayTasks[index] = !db.todayTasks[index];
+            const allDone = db.todayTasks.filter(Boolean).length === TOTAL_TASKS;
+            if (allDone) {
+                db.completedDays[db.currentStreak] = true;
+            } else {
+                delete db.completedDays[db.currentStreak];
+            }
+            saveStorage();
+            renderDashboard();
+            renderMatrix();
+        }
+
+        function renderDashboard() {
+            document.getElementById('displayGoal').innerText = db.goal;
+            document.getElementById('currentStreak').innerText = db.currentStreak;
+            
+            const completedCount = Object.keys(db.completedDays).length;
+            const bestStreakVal = Math.max(db.currentStreak, completedCount);
+            document.getElementById('bestStreak').innerText = bestStreakVal;
+            
+            document.getElementById('failedAttempts').innerText = db.failedAttempts || 0;
+            const totalDaysTried = (db.failedAttempts || 0) + db.currentStreak;
+            document.getElementById('totalDaysTried').innerText = totalDaysTried;
+
+            document.getElementById('taskName0').innerText = db.task1Name;
+            document.getElementById('taskSub0').innerText = `${db.deepTime} Minutes • Focused Session`;
+            document.getElementById('taskName1').innerText = db.task2Name;
+            document.getElementById('taskSub1').innerText = `${db.theoryTime} Minutes • Active Learning`;
+
+            const subContainer = document.getElementById('displaySubTargetsContainer');
+            subContainer.innerHTML = '';
+            if (db.subTargets && db.subTargets.length > 0) {
+                subContainer.style.display = 'flex';
+                db.subTargets.forEach(st => {
+                    const tag = document.createElement('div');
+                    tag.className = 'sub-target-tag';
+                    tag.innerText = st;
+                    subContainer.appendChild(tag);
+                });
+            } else {
+                subContainer.style.display = 'none';
+            }
+
+            let doneCount = 0;
+            for (let i = 0; i < TOTAL_TASKS; i++) {
+                const isDone = db.todayTasks[i];
+                const el = document.getElementById(`chk-${i}`).parentElement;
+                if (isDone) {
+                    el.classList.add('done');
+                    doneCount++;
+                } else {
+                    el.classList.remove('done');
+                }
+            }
+            document.getElementById('completionFraction').innerText = `${doneCount}/${TOTAL_TASKS}`;
+        }
+
+        function addBook() {
+            const titleInput = document.getElementById('newBookTitle');
+            const authorInput = document.getElementById('newBookAuthor');
+            const title = titleInput.value.trim();
+            const author = authorInput.value.trim();
+
+            if (!title) return;
+
+            if (!db.books) db.books = [];
+            db.books.push({
+                id: 'BOOK_' + Date.now(),
+                title: title,
+                author: author || 'Self-Development',
+                progress: 0
+            });
+
+            saveStorage();
+            renderBooks();
+            titleInput.value = '';
+            authorInput.value = '';
+            showToast("Book Added");
+        }
+
+        function updateBookProgress(id, val) {
+            const book = db.books.find(b => b.id === id);
+            if (book) {
+                book.progress = parseInt(val);
+                saveStorage();
+                document.getElementById(`lbl-${id}`).innerText = `${val}%`;
+            }
+        }
+
+        function deleteBook(id) {
+            db.books = db.books.filter(b => b.id !== id);
+            saveStorage();
+            renderBooks();
+        }
+
+        function renderBooks() {
+            const container = document.getElementById('booksListContainer');
+            const countLabel = document.getElementById('booksCount');
+            if (!db.books) db.books = [];
+
+            countLabel.innerText = `${db.books.length} Books`;
+            container.innerHTML = '';
+
+            if (db.books.length === 0) {
+                container.innerHTML = '<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:10px 0;">No books added to your reading list.</div>';
+                return;
+            }
+
+            db.books.forEach(book => {
+                const item = document.createElement('div');
+                item.className = 'book-item';
+                item.innerHTML = `
+                    <div class="book-meta">
+                        <div>
+                            <div class="book-title">${book.title}</div>
+                            <div class="book-author">${book.author}</div>
+                        </div>
+                        <button onclick="deleteBook('${book.id}')" style="background:none; border:none; color:var(--pastel-rose); cursor:pointer; font-size:0.8rem;">✕</button>
+                    </div>
+                    <div class="book-slider-row">
+                        <input type="range" class="book-slider" min="0" max="100" value="${book.progress}" oninput="updateBookProgress('${book.id}', this.value)">
+                        <div class="book-percent" id="lbl-${book.id}">${book.progress}%</div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderMatrix() {
+            const container = document.getElementById('matrixContainer');
+            container.innerHTML = '';
+            for (let i = 1; i <= 90; i++) {
+                const node = document.createElement('div');
+                node.className = 'grid-node';
+                node.innerText = i;
+                if (db.completedDays[i]) node.classList.add('done');
+                else if (i === db.currentStreak) node.classList.add('active');
+                container.appendChild(node);
+            }
+        }
+
+        async function handleNativeFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const timestamp = new Date();
+            const recordId = 'REC_' + timestamp.getTime();
+            const dayNum = db.currentStreak;
+
+            const metaItem = {
+                id: recordId,
+                dayNumber: dayNum,
+                date: timestamp.toLocaleDateString(),
+                time: timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                type: type,
+                fileName: file.name
+            };
+
+            try {
+                await saveMediaBlobToIDB(metaItem, file);
+                if (!db.journalMeta) db.journalMeta = [];
+                db.journalMeta.unshift(metaItem);
+                saveStorage();
+
+                renderArchive();
+                renderDashboard();
+                showToast(`Saved to Day ${dayNum} Archive`);
+            } catch(err) {
+                alert('Storage Error: ' + err.message);
+            }
+        }
+
+        async function deleteJournalEntry(id) {
+            if (!confirm("Are you sure you want to permanently delete this reflection recording?")) return;
+
+            try {
+                await deleteMediaBlobFromIDB(id);
+                db.journalMeta = (db.journalMeta || []).filter(item => item.id !== id);
+                saveStorage();
+                renderArchive();
+                showToast("Recording Deleted");
+            } catch(err) {
+                alert('Delete Error: ' + err.message);
+            }
+        }
+
+        async function renderArchive() {
+            const container = document.getElementById('journalArchiveList');
+            if (!db.journalMeta || db.journalMeta.length === 0) {
+                container.innerHTML = '<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:20px 0;">No audio or video reflections recorded yet.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            const grouped = {};
+            db.journalMeta.forEach(item => {
+                const dayKey = item.dayNumber || 1;
+                if (!grouped[dayKey]) grouped[dayKey] = [];
+                grouped[dayKey].push(item);
+            });
+
+            const sortedDays = Object.keys(grouped).sort((a,b) => b - a);
+
+            for (let day of sortedDays) {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'card-box';
+                dayCard.style.padding = '12px';
+                
+                let innerHtml = `
+                    <div style="font-family:'Space Grotesk', sans-serif; font-size:1rem; font-weight:700; color:var(--pastel-blue); border-bottom:1px solid var(--card-border); padding-bottom:6px; margin-bottom:8px;">
+                        DAY ${day}
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:12px;"></div>
+                `;
+
+                dayCard.innerHTML = innerHtml;
+                const listWrapper = dayCard.querySelector('div:nth-child(2)');
+
+                for (let item of grouped[day]) {
+                    const entryBox = document.createElement('div');
+                    entryBox.style.background = 'var(--bg-deep)';
+                    entryBox.style.border = '1px solid var(--card-border)';
+                    entryBox.style.padding = '10px';
+                    entryBox.style.borderRadius = '8px';
+
+                    const blob = await getMediaBlobFromIDB(item.id);
+                    let mediaSrc = blob ? URL.createObjectURL(blob) : '';
+
+                    let mediaHtml = '';
+                    if (item.type === 'video') {
+                        mediaHtml = mediaSrc ? `<video controls src="${mediaSrc}" style="width:100%; max-height:220px; border-radius:6px; margin-top:6px; background:#000;"></video>` : '<div style="font-size:0.7rem; color:var(--pastel-rose); margin-top:4px;">Video stream unavailable</div>';
+                    } else {
+                        mediaHtml = mediaSrc ? `<audio controls src="${mediaSrc}" style="width:100%; height:36px; margin-top:6px;"></audio>` : '<div style="font-size:0.7rem; color:var(--pastel-rose); margin-top:4px;">Audio stream unavailable</div>';
+                    }
+
+                    entryBox.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="font-size:0.75rem; font-weight:700; color:var(--cloud-white);">
+                                ${item.type.toUpperCase()} REFLECTION
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div style="font-size:0.65rem; color:var(--text-muted);">
+                                    ${item.date} (${item.time})
+                                </div>
+                                <button class="btn-delete-media" onclick="deleteJournalEntry('${item.id}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                        ${mediaHtml}
+                    `;
+                    listWrapper.appendChild(entryBox);
+                }
+
+                container.appendChild(dayCard);
+            }
+        }
+
+        function startMidnightTimer() {
+            setInterval(() => {
+                const now = new Date();
+                const midnight = new Date();
+                midnight.setHours(24, 0, 0, 0);
+                const diff = midnight - now;
+
+                const hrs = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('midnightCountdown').innerText = 
+                    `⚡ ${String(hrs).padStart(2,'0')}H ${String(mins).padStart(2,'0')}M LEFT`;
+            }, 1000);
+        }
+
+        function switchPage(pageId, btnEl) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`page-${pageId}`).classList.add('active');
+            btnEl.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toastMsg');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        function triggerResetModal() {
+            if (confirm("Are you sure you want to reset your active streak back to Day 1? This will log a failed attempt.")) {
+                db.failedAttempts = (db.failedAttempts || 0) + 1;
+                db.currentStreak = 1;
+                db.todayTasks = [false, false, false, false];
+                saveStorage();
+                renderDashboard();
+                renderMatrix();
+                showToast("Streak Reset & Failed Attempt Logged");
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
