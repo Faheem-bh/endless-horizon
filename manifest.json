@@ -1,0 +1,21 @@
+{
+  "short_name": "EndlessHorizon",
+  "name": "Endless Horizon: 90-Day Focus",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#161922",
+  "theme_color": "#1e222d",
+  "display": "standalone",
+  "orientation": "any"
+}

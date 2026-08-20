@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Endless Horizon: 90-Day Focus</title>
+    
+    <!-- PWA Manifest & iOS Metas -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EndlessHorizon">
+    <meta name="theme-color" content="#161922">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #161922;
+            --bg-surface: #202532;
+            --card-border: #2e3547;
+            
+            --pastel-sage: #a8d5ba;
+            --pastel-blue: #9bb7d4;
+            --pastel-peach: #f4c2ac;
+            --pastel-lavender: #c5b4e3;
+            --pastel-rose: #e8a7a1;
+            
+            --cloud-white: #f0f3f8;
+            --text-muted: #8e99b0;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            
+            --nav-height: 75px;
+            --sidebar-width: 240px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            background-color: var(--bg-deep);
+            color: var(--cloud-white);
+        }
+
+        body {
+            min-height: 100vh;
+            padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom));
+            margin: 0 auto;
+            position: relative;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Mobile Container Layout */
+        .app-viewport {
+            width: 100%;
+            max-width: 680px;
+            margin: 0 auto;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: max-width 0.3s ease;
+        }
+
+        header {
+            background: var(--bg-deep);
+            padding-top: calc(16px + var(--safe-area-top));
+            padding-bottom: 12px;
+            padding-left: 16px;
+            padding-right: 16px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .brand-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.1rem, 4.5vw, 1.35rem);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--pastel-peach);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .horizon-clock {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            color: var(--pastel-blue);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: clamp(0.65rem, 2.5vw, 0.75rem);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        /* Navigation Bar (Mobile View Default) */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--card-border);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding-top: 8px;
+            padding-bottom: calc(8px + var(--safe-area-bottom));
+            z-index: 100;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: clamp(0.55rem, 2vw, 0.68rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.1s, background 0.2s;
+            padding: 6px 0;
+            position: relative;
+        }
+
+        .tab-btn:active {
+            transform: scale(0.95);
+        }
+
+        .tab-btn.active {
+            color: var(--pastel-peach);
+        }
+
+        .tab-btn.active::before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            width: 22px;
+            height: 3px;
+            border-radius: 3px;
+            background: var(--pastel-peach);
+        }
+
+        .tab-btn svg {
+            width: clamp(18px, 5vw, 22px);
+            height: clamp(18px, 5vw, 22px);
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .page {
+            display: none;
+            padding: 16px;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .hero-banner {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--pastel-peach);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hero-title {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .hero-goal {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+            font-weight: 700;
+            color: var(--cloud-white);
+            word-break: break-word;
+        }
+
+        .sub-targets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 2px;
+            padding-top: 6px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .sub-target-tag {
+            font-size: 0.78rem;
+            color: var(--pastel-blue);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .sub-target-tag::before {
+            content: "•";
+            color: var(--pastel-peach);
+            font-size: 1rem;
+        }
+
+        /* Grid Frameworks */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 14px 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card:nth-child(1) { border-bottom: 3px solid var(--pastel-blue); }
+        .stat-card:nth-child(2) { border-bottom: 3px solid var(--pastel-peach); }
+        .stat-card:nth-child(3) { border-bottom: 3px solid var(--pastel-rose); }
+        .stat-card:nth-child(4) { border-bottom: 3px solid var(--pastel-lavender); }
+
+        .stat-card:nth-child(1) .stat-val { color: var(--pastel-blue); }
+        .stat-card:nth-child(2) .stat-val { color: var(--pastel-peach); }
+        .stat-card:nth-child(3) .stat-val { color: var(--pastel-rose); }
+        .stat-card:nth-child(4) .stat-val { color: var(--pastel-lavender); }
+
+        .stat-val {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
+            line-height: 1.1;
+            font-weight: 700;
+        }
+
+        .stat-lbl {
+            font-size: clamp(0.6rem, 2.2vw, 0.68rem);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 4px;
+            letter-spacing: 0.04em;
+        }
+
+        .card-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(0.95rem, 3.8vw, 1.15rem);
+            font-weight: 700;
+            color: var(--cloud-white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-item {
+            background: var(--bg-deep);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            cursor: pointer;
+            min-height: 52px;
+            transition: border-color 0.2s;
+        }
+
+        .task-item:hover { border-color: var(--pastel-peach); }
+
+        .task-item.done {
+            border-color: var(--pastel-sage);
+            background: var(--bg-surface);
+        }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .task-name {
+            font-size: clamp(0.82rem, 3.2vw, 0.9rem);
+            font-weight: 600;
+            color: var(--cloud-white);
+            word-break: break-word;
+        }
+
+        .task-item.done .task-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-sub {
+            font-size: clamp(0.68rem, 2.6vw, 0.75rem);
+            color: var(--text-muted);
+        }
+
+        .task-check {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            border: 2px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .task-item.done .task-check {
+            background: var(--pastel-sage);
+            border-color: var(--pastel-sage);
+            color: #121815;
+            font-weight: bold;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 6px;
+        }
+
+        .grid-node {
+            aspect-ratio: 1;
+            background: var(--bg-deep);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.6rem, 2vw, 0.75rem);
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .grid-node.done {
+            background: var(--pastel-sage);
+            border-color: var(--pastel-sage);
+            color: #121815;
+            font-weight: 700;
+        }
+
+        .grid-node.active {
+            border-color: var(--pastel-peach);
+            color: var(--pastel-peach);
+            font-weight: 800;
+        }
+
+        .toast {
+            position: fixed;
+            top: calc(16px + var(--safe-area-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--pastel-sage);
+            color: #101a14;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+            z-index: 300;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ==========================================================================
+           DESKTOP & TABLET MEDIA QUERIES
+           ========================================================================== */
+        @media (min-width: 768px) {
+            body {
+                padding-bottom: 0;
+                padding-left: var(--sidebar-width);
+            }
+
+            /* Convert bottom navigation bar to desktop side menu */
+            .tab-bar {
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: var(--sidebar-width);
+                height: 100vh;
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(5, auto);
+                justify-content: start;
+                align-content: start;
+                padding-top: 80px;
+                padding-bottom: 20px;
+                padding-left: 12px;
+                padding-right: 12px;
+                gap: 8px;
+                border-top: none;
+                border-right: 1px solid var(--card-border);
+            }
+
+            .tab-btn {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 12px;
+                padding: 12px 16px;
+                border-radius: var(--radius-md);
+                font-size: 0.85rem;
+                width: 100%;
+            }
+
+            .tab-btn:hover {
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--cloud-white);
+            }
+
+            .tab-btn.active {
+                background: var(--bg-deep);
+                color: var(--pastel-peach);
+                border: 1px solid var(--card-border);
+            }
+
+            .tab-btn.active::before {
+                display: none;
+            }
+
+            .app-viewport {
+                max-width: 850px;
+                margin: 0 left;
+                padding: 20px 30px;
+            }
+
+            header {
+                position: relative;
+                background: transparent;
+                border-bottom: 1px solid var(--card-border);
+                padding-left: 0;
+                padding-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .page {
+                padding: 16px 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .matrix-grid {
+                grid-template-columns: repeat(15, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .app-viewport {
+                max-width: 1000px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-viewport">
+        <header>
+            <div class="brand-banner">
+                <div class="brand-title">Endless Horizon</div>
+                <div class="horizon-clock" id="clock-display">DAY 1 / 90</div>
+            </div>
+        </header>
+
+        <!-- Main Pages -->
+        <main>
+            <!-- Today / Dashboard -->
+            <section id="page-today" class="page active">
+                <div class="hero-banner">
+                    <div class="hero-title">Core Objective</div>
+                    <div class="hero-goal" id="display-goal">90-Day Focus Goal</div>
+                    <div class="sub-targets-list" id="display-subtargets"></div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-streak">0</div>
+                        <div class="stat-lbl">Day Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-progress">0%</div>
+                        <div class="stat-lbl">Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-tasks">0/0</div>
+                        <div class="stat-lbl">Today's Tasks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-days">90</div>
+                        <div class="stat-lbl">Days Left</div>
+                    </div>
+                </div>
+
+                <div class="card-box">
+                    <div class="card-header">Daily Actions</div>
+                    <div id="daily-tasks-list">
+                        <!-- Tasks inject dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 90-Day Grid Matrix -->
+            <section id="page-matrix" class="page">
+                <div class="card-box">
+                    <div class="card-header">90-Day Grid Matrix</div>
+                    <div class="matrix-grid" id="matrix-container">
+                        <!-- 90 Days grid items generate dynamically -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Responsive Navigation Bar / Sidebar -->
+    <nav class="tab-bar">
+        <button class="tab-btn active" onclick="switchPage('today')">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            <span>Today</span>
+        </button>
+        <button class="tab-btn" onclick="switchPage('matrix')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Matrix</span>
+        </button>
+    </nav>
+
+    <div id="toast" class="toast">Progress Saved</div>
+
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('Service Worker Registered:', reg.scope))
+                    .catch((err) => console.error('Service Worker Registration Failed:', err));
+            });
+        }
+
+        // Navigation Management
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if(targetPage) targetPage.classList.add('active');
+            
+            // Highlight button
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(pageId));
+            if(activeBtn) activeBtn.classList.add('active');
+        }
+
+        // Initialize 90-Day Matrix Display
+        function initMatrix() {
+            const container = document.getElementById('matrix-container');
+            if(!container) return;
+            container.innerHTML = '';
+            for(let i = 1; i <= 90; i++) {
+                const node = document.createElement('div');
+                node.className = 'grid-node' + (i === 1 ? ' active' : '');
+                node.innerText = i;
+                container.appendChild(node);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMatrix();
+        });
+    </script>
+</body>
+</html>
